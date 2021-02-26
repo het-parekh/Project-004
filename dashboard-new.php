@@ -48,6 +48,9 @@ if(isset($_COOKIE['username'])):{
 				  <div class="card-body">
 				    <h4 class="card-title"><b>Profile Info</b></h4>
 				  <?php echo"Mr.$result"?>
+				  	<a href="./UserManual.pdf" download="UserManual.pdf" target="_blank" style="float: right;">
+						<button>User Manual</button>
+					</a>
 				    <p class="card-text"><i class="fa fa-user">&nbsp;</i>Admin</p>
 				    <!-- <p class="card-text">Last Login : xxxx-xx-xx</p> -->
 				    <a href="GroupForm.php" class="btn btn-outline-primary"><i class="fa fa-edit">&nbsp;</i>Create Group</a>
@@ -68,7 +71,7 @@ if(isset($_COOKIE['username'])):{
 						<div class="col-sm-6">
 							<div class="card">
 						      <div class="card-body" border-radius:24px>
-						        <h4 class="card-title"><b>New Issue/Return</b></h4>
+						        <h4 class="card-title"><b>Issue/Return</b></h4>
 						        <p class="card-text">Here you can create new issues/returns</p>
 						        <a href="Issue_and_Return.php" class="btn btn-outline-primary">New Issue</a>
 						      </div>
