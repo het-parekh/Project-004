@@ -1,6 +1,16 @@
 <?php
+include "includes/DB.php";
+include "includes/environment.php";
 if(isset($_COOKIE['username'])):{
-    $name=$_COOKIE['username'];
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+        $encryption_key, $options, $encryption_iv); 
+	$query = "SELECT user_name FROM admin WHERE email='$name'";
+	$data=mysqli_query($con,$query);
+	if(mysqli_num_rows($data)>0){
+		$result=mysqli_fetch_assoc($data)['user_name'];
+	}else{
+		echo "<script>location.href='logout.php'</script>";
+	}
 }
 
 ?>
@@ -12,15 +22,20 @@ if(isset($_COOKIE['username'])):{
 
         <title>Change Group</title>
         
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
         <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="./css/group.css">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
     </head>
     <script>
-	 $("#header").load("./header.html")
+   $("#header").load("./header.html")
+   $("#footer-section").load("footer.html")
 </script>
 <body>
 <div id="header"></div>
@@ -86,6 +101,8 @@ if(isset($_COOKIE['username'])):{
           </div>
           </div>
         </form>
+
+        <div id="footer-section"></div>
     </body>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

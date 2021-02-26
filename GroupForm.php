@@ -1,6 +1,16 @@
 <?php
+include "includes/DB.php";
+include "includes/environment.php";
 if(isset($_COOKIE['username'])):{
-    $name=$_COOKIE['username'];
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+        $encryption_key, $options, $encryption_iv); 
+	$query = "SELECT user_name FROM admin WHERE email='$name'";
+	$data=mysqli_query($con,$query);
+	if(mysqli_num_rows($data)>0){
+		$result=mysqli_fetch_assoc($data)['user_name'];
+	}else{
+		echo "<script>location.href='logout.php'</script>";
+	}
 }
  
 ?>
@@ -16,16 +26,14 @@ if(isset($_COOKIE['username'])):{
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.9/dist/css/bootstrap-select.min.css">
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
     </head>
 
-    <script>
-	 $(function(){
-	$("#header").load("header.html"); 
-});
-	</script>
-
     <body>
-	    <div id="header"></div>
+      <div id="header"></div>
+      <div class="main-content" style="margin-top:-370px;">
+
         <div class="mx-auto" style="width: 70%;margin-top:2%">
         <div class="card text-center" >
             <div class="card-header">
@@ -83,6 +91,10 @@ if(isset($_COOKIE['username'])):{
           </div>
           </div>
         </form>
+      </div>
+
+
+        <div id="footer-section"></div>
     </body>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

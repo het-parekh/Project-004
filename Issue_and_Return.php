@@ -1,6 +1,16 @@
 <?php
+include "includes/DB.php";
+include "includes/environment.php";
 if(isset($_COOKIE['username'])):{
-    $name=$_COOKIE['username'];
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+        $encryption_key, $options, $encryption_iv); 
+	$query = "SELECT user_name FROM admin WHERE email='$name'";
+	$data=mysqli_query($con,$query);
+	if(mysqli_num_rows($data)>0){
+		$result=mysqli_fetch_assoc($data)['user_name'];
+	}else{
+		echo "<script>location.href='logout.php'</script>";
+	}
 }
 ?>
 <!DOCTYPE html>
@@ -13,6 +23,9 @@ if(isset($_COOKIE['username'])):{
     <title>Inventory Management System</title>
     <link rel="stylesheet" type="text/css" href="./css/Issue_Return.css">
     
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -38,19 +51,21 @@ if(isset($_COOKIE['username'])):{
         <script type="text/javascript" src="./js/main.js"></script>
     <script type="text/javascript" src="./js/decor.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     
 
 </head>
 <script>
 		 $(function(){
-	$("#header").load("header.html"); 
+    $("#header").load("header.html");
+  $("#footer-section").load("footer.html"); 
 });
 </script>
 <body>
 <div id="header"></div>
     
-    <div class="container">
+    <div class="container" style="margin-top:-250px; margin-bottom:160px;">
         <div class="row">
             <div class="col-md-10 mx-auto">
                 <div class="card" style="box-shadow:0 0 25px 0 lightgrey;">
@@ -117,7 +132,7 @@ if(isset($_COOKIE['username'])):{
                                 <div class="form-group row" id="due_date_div" >
                                     <label class="col-sm-3 col-form-label" align="right">Due Date</label>
                                     <div class="col-sm-6">
-                                        <input id="due_date" type="date" min="<?php echo date("Y-m-d"); ?>" name="order_date"  class="form-control form-control-sm">
+                                        <input required id="due_date" type="date" min="<?php echo date("Y-m-d"); ?>" name="order_date"  class="form-control form-control-sm">
                                     </div>
                                 </div>
 
@@ -192,6 +207,7 @@ if(isset($_COOKIE['username'])):{
         </div>
     </div>
 
+    <div id="footer-section"></div>
 
 
 </body>

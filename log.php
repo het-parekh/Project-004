@@ -1,6 +1,8 @@
 <?php
  if(isset($_COOKIE['username'])):{
-    $name=$_COOKIE['username'];
+    include 'includes/environment.php';
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+    $encryption_key, $options, $encryption_iv); 
  }
 ?>
 <html>
@@ -20,19 +22,24 @@
     <script src="./js/log.js"></script>
     <link rel="stylesheet" type="text/css" href="css/log.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
     <script src= "//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"> 
 </script> 
 </head>
 
 <script>
 	 	 $(function(){
-	$("#header").load("header.html"); 
+    $("#header").load("header.html"); 
+  $("#footer-section").load("footer.html")
+    
 });
 </script>
 <body style="background-color: white;margin:0px;padding:0px">
 <div id="header"></div>
 
-    <div style="width:100%;" >
+<div class="main-content" style="margin-top:-350px;  background:#fff; width:80%; position:relative; left:50%; transform:translate(-50%); box-shadow:4px 8px 16px rgba(0,0,0,.4); border-radius:10px; padding-bottom:20px;">
+<div style="width:100%;" >
     <div class="logo">
     <a >Logs</a>
 </div>
@@ -57,7 +64,10 @@
 <div id="return">
 </div>
 </div>
+</div>
+    
 
+<div id="footer-section"></div>
 
 </body>
 </html>

@@ -1,6 +1,16 @@
 <?php
+include "includes/DB.php";
+include "includes/environment.php";
 if(isset($_COOKIE['username'])):{
-    $name=$_COOKIE['username'];
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+        $encryption_key, $options, $encryption_iv); 
+	$query = "SELECT user_name FROM admin WHERE email='$name'";
+	$data=mysqli_query($con,$query);
+	if(mysqli_num_rows($data)>0){
+		$result=mysqli_fetch_assoc($data)['user_name'];
+	}else{
+		echo "<script>location.href='logout.php'</script>";
+	}
 }
 ?>
 <html>
@@ -17,7 +27,9 @@ if(isset($_COOKIE['username'])):{
     </script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
         integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous">
-    </script>
+		</script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+		
 	</head>
 	<style>
 		#delete:hover{
@@ -27,10 +39,14 @@ if(isset($_COOKIE['username'])):{
 	<script>
 	 	 $(function(){
 	$("#header").load("header.html"); 
+	$("#footer-section").load("footer.html")
+
 });
 </script>
 	<body>
 	<div id="header"></div>
+	<div class="main-content"style="margin-top:-370px; background:#fff; width:80%; position:relative; left:50%; transform:translate(-50%); box-shadow:4px 8px 16px rgba(0,0,0,.4); border-radius:10px; padding:10px 20px;" >
+
 		<div class="container">
 			<br />
 			<br />
@@ -52,6 +68,9 @@ if(isset($_COOKIE['username'])):{
 		<br />
 		<br />
 		<br />
+	</div>
+
+		<div id="footer-section"></div>
 	</body>
 </html>
 <?php
@@ -65,6 +84,7 @@ endif
 
 <script>
 $(document).ready(function(){
+
 	load_data();
 	function load_data(query)
 	{

@@ -1,9 +1,16 @@
 <?php
+include "includes/DB.php";
+include 'includes/environment.php';
 if(isset($_COOKIE['username'])):{
-	$name=$_COOKIE['username'];
-	include "includes/DB.php";
-	$data=($con)?(mysqli_query($con,"Select user_name from admin where email='$name'")):"";
-	$result=mysqli_fetch_assoc($data)['user_name'];
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+        $encryption_key, $options, $encryption_iv); 
+	$query = "SELECT user_name FROM admin WHERE email='$name'";
+	$data=mysqli_query($con,$query);
+	if(mysqli_num_rows($data)>0){
+		$result=mysqli_fetch_assoc($data)['user_name'];
+	}else{
+		echo "<script>location.href='logout.php'</script>";
+	}
 }
 ?>
 
@@ -35,6 +42,8 @@ if(isset($_COOKIE['username'])):{
         integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk=" crossorigin="anonymous"></script>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script type="text/javascript" src="./js/main.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
 </head>
 <style>
 
@@ -117,6 +126,8 @@ if(isset($_COOKIE['username'])):{
 </style>
 <body>
 
+  <div id="header"></div>
+  <div class="main-content" style="margin-top:-330px; background-color:#fff; width:80%; position:relative; left:50%; transform:translate(-50%); box-shadow:4px 8px 16px rgba(0,0,0,.4); border-radius:10px;">
     <!-- Popup to add new damaged component -->
     <div id="newly-damaged">
         <div id="close-modal"> &#10006; </div>
@@ -138,10 +149,10 @@ if(isset($_COOKIE['username'])):{
                         >
                     </td>
                     <td>
-                        <input type="number" required class="form-control form-control-sm avail_qty">
+                        <input type="number" required class="form-control form-control-sm avail_qty" id="id_avail_qty">
                     </td>
                     <td>
-                        <input type="number" required class="form-control form-control-sm dmg_qty">
+                        <input type="number" required class="form-control form-control-sm dmg_qty" id="id_dmg_qty">
                     </td>
                 </tr>
 
@@ -150,7 +161,6 @@ if(isset($_COOKIE['username'])):{
         <button id="mark-new-damage" class="btn btn-outline-danger mt-3">Mark as Damaged</button>
 
     </div>
-
     <!-- Popup to mark damaged component as repaired -->
     <div id="repair-comp">
         <div id="close-repair-modal"> &#10006; </div>
@@ -162,17 +172,18 @@ if(isset($_COOKIE['username'])):{
         </div>
         <button class="btn btn-outline-info mt-4" id="repair-db">Repair</button>       
     </div>
-    </div>
+        <!-- </div> -->
+
     <!-- Display list of damaged component -->
     <div class="container">
-        <h1 class="mb-3"> Damaged Components</h1>
+        <h1 class="mb-3"> Damaged Components List</h1>
 
         <table class="table table-striped">
             <tr>
                 <th>C ID</th>
                 <th>Description</th>
                 <th>Size</th>
-                <th>Quantity</th>
+                <th>Available Quantity</th>
                 <th>Price</th>
                 <th>Damaged Quantity</th>
                 <th>Change Status</th>
@@ -190,11 +201,11 @@ if(isset($_COOKIE['username'])):{
                                 <td> <?php echo $row['C_ID']; ?> </td>
                                 <td> <?php echo $row['Description']; ?> </td>
                                 <td> <?php echo $row['Size']; ?> </td>
-                                <td> <?php echo $row['Quantity']; ?> </td>
+                                <td> <?php echo ($row['Quantity'] - $row['Quantity_Damaged']); ?> </td>
                                 <td> <?php echo $row['Price']; ?> </td>
                                 <td> <?php echo $row['Quantity_Damaged']; ?> </td>
                                 <td>
-                                    <button onclick="repair('<?php echo $row['Description'] ?>','<?php echo $row['C_ID'] ?>', '<?php echo $row['Quantity_Damaged'] ?>')" class="btn btn-outline-info <?php echo $row['C_ID'] ?>"  >Repaired</button>
+                                    <button onclick="repair('<?php echo $row['Description'] ?>','<?php echo $row['C_ID'] ?>', '<?php echo $row['Quantity_Damaged'] ?>')" class="btn btn-outline-info <?php echo $row['C_ID'] ?>"  >Repair</button>
                                 </td>
                             </tr>
             <?php }
@@ -206,15 +217,24 @@ if(isset($_COOKIE['username'])):{
                     echo "connection unsuccessful";
                 }
             ?>
-    </table>
+        </table>
         <div class="add-damaged-component text-center mt-3">
-                <button class="btn btn-outline-success" id="add-Damaged-comp">Add new Damaged component</button>
+                <button class="btn btn-outline-success" style="cursor:pointer;" id="add-Damaged-comp">Add new Damaged component</button>
         </div>
 
     </div>
+  </div>
     
 
+    
+    
+    <div id="footer-section"></div>
+
   <script>
+
+	$("#header").load("./header.html")
+    $("#footer-section").load("footer.html")
+
     
     const btnShowAdd = document.querySelector('#add-Damaged-comp')
     const closeModal = document.querySelector('#close-modal')
@@ -251,20 +271,57 @@ if(isset($_COOKIE['username'])):{
         qtyInput.max = qty
         repairModal.classList.add('active')
 
-        repairFromDb.addEventListener('click',()=>{
-        $.ajax({
-            method: "POST",
-            url: DOMAIN+"/includes/repair.php",
-            data:{c_id: id, qty: qtyInput.value},
-            success: function(msg){
-                console.log(msg);
-                location.reload();
-            }
-        })
+        repairFromDb.addEventListener('click',(e)=>{
+        
+        if(parseInt(qtyInput.value) > parseInt(qty)){
+            e.preventDefault()
+            alert('please enter quantity lower than damaged quantity');
+        }
+        else{
+            $.ajax({
+                method: "POST",
+                url: DOMAIN+"/includes/repair.php",
+                data:{c_id: id, qty: qtyInput.value},
+                success: function(msg){
+                    location.reload();
+                }
+            })
+        }
+        
     })
         
     }
 
+    document.querySelector('#mark-new-damage').addEventListener('click',(e)=>{
+			console.log($('.c_id')[0].value,$('.c_name')[0].value)
+			if(!window.confirm("Mark the selected components as damaged?")){
+				e.preventDefault();
+			}
+			else if($('.dmg_qty')[0].value < 1 || parseInt($('.dmg_qty')[0].value) > parseInt($('.avail_qty')[0].value) ){
+				e.preventDefault();
+				alert("Please enter value of Damaged Quantity between 1 and total available quantity of selected component");
+				
+			}
+			else{
+				markDamage($('.c_id')[0].value, $('.dmg_qty')[0].value);
+			}
+		})
+		
+		function markDamage(id,qty){
+			var c_id = id;
+			var dmg_qty = qty;
+			console.log(c_id,dmg_qty)
+
+			$.ajax({
+				method: "POST",
+				url: DOMAIN+"/includes/damaged.php",
+				data: {c_id: c_id, qty: dmg_qty},
+				success: function(msg){
+					console.log(msg)
+					location.reload()
+				}
+			})
+		}
   </script>
 
 </body>

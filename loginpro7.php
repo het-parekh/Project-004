@@ -17,7 +17,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
  	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
  	<link rel="stylesheet" type="text/css" href="./includes/style.css">
- 	<script type="text/javascript" rel="stylesheet" src="./js/main.js"></script>
+	 <script type="text/javascript" rel="stylesheet" src="./js/main.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+	 
  </head>
 <body>
 	<style>
@@ -64,6 +66,7 @@
 		</div> 
 	</div>
 		</form>
+		<div id="footer-section"></div>
 </body>
 </html>
 <?php
@@ -71,12 +74,15 @@ if(isset($_POST['click'])){
 $name=$_POST['email'];
 $password=$_POST['password'];
 include 'includes/DB.php';
+include 'includes/environment.php';
 if($con){
    $query= mysqli_query($con,"SELECT Password FROM admin WHERE email='$name'");
         if(mysqli_num_rows($query)>0){
         $row=mysqli_fetch_array($query);
           if(password_verify($password,$row[0])){
-            setcookie('username',$name,time()+60*60*24*30);
+			$encryption = openssl_encrypt($name, $ciphering, 
+            $encryption_key, $options, $encryption_iv); 
+            setcookie('username',$encryption,time()+60*60*24*30);
             echo"<script>location.href='dashboard-new.php'</script>";
           }
           else{

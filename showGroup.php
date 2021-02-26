@@ -1,7 +1,16 @@
 <?php
+include "includes/DB.php";
+include "includes/environment.php";
 if(isset($_COOKIE['username'])):{
-    $name=$_COOKIE['username'];
-    include 'includes/DB.php';
+    $name=openssl_decrypt ($_COOKIE['username'], $ciphering,  
+        $encryption_key, $options, $encryption_iv); 
+	$query = "SELECT user_name FROM admin WHERE email='$name'";
+	$data=mysqli_query($con,$query);
+	if(mysqli_num_rows($data)>0){
+		$result=mysqli_fetch_assoc($data)['user_name'];
+	}else{
+		echo "<script>location.href='logout.php'</script>";
+	}
 }
  
 ?>
@@ -41,6 +50,8 @@ if(isset($_COOKIE['username'])):{
     <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="js/showGroup.js"></script>
+	 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
 
     <style>
         button{
@@ -59,12 +70,15 @@ if(isset($_COOKIE['username'])):{
 </head>
 <script>
 		 $(function(){
-	$("#header").load("header.html"); 
+    $("#header").load("header.html"); 
+   $("#footer-section").load("footer.html")
+    
 });
 </script>
 <body>
 	<div id="header"></div>
-   
+   <div class="main-content" style="margin-top:-370px; background:#fff; width:80%; position:relative; left:50%; transform:translate(-50%); box-shadow:4px 8px 16px rgba(0,0,0,.4); border-radius:10px; padding:10px;">
+       
     <table class = "table table bordered">
         <tr>
             <th>Group ID</th>
@@ -99,9 +113,15 @@ if(isset($_COOKIE['username'])):{
             }
         ?>
 
+    </div>
+
+        <div id="footer-section"></div>
         
 
         <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script> -->
+    
+
+    
     </body>
 </html>
 

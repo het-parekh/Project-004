@@ -1,5 +1,5 @@
 <?php
-$con=mysqli_connect("localhost","root","","iot_inventory");
+$con=mysqli_connect("localhost","root","","inventory");
 ?>
 <?php
 session_start();
