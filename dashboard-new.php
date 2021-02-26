@@ -71,7 +71,7 @@ if(isset($_COOKIE['username'])):{
 						<div class="col-sm-6">
 							<div class="card">
 						      <div class="card-body" border-radius:24px>
-						        <h4 class="card-title"><b>Issue/Return</b></h4>
+						        <h4 class="card-title"><b>New Issue/Return</b></h4>
 						        <p class="card-text">Here you can create new issues/returns</p>
 						        <a href="Issue_and_Return.php" class="btn btn-outline-primary">New Issue</a>
 						      </div>
